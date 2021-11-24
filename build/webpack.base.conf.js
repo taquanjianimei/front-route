@@ -3,6 +3,8 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
+const MiniCssExtractPlugin = require('./mini-css-extract-plugin')
+const autoprefixer = require('autoprefixer')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -45,6 +47,30 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: vueLoaderConfig
+      },
+      {
+        test: /\.(sc|sa|c)ss$/,
+        include: [resolve('src'), resolve('/node-modules/element-ui/lib')],
+        use: [
+            process.env.NODE_ENV !== 'production'
+                ? 'vue-style-loader'
+                : MiniCssExtractPlugin.loader,
+            {
+                loader: 'css-loader',
+                options: {
+                    importLoaders: 3 // 指定css-loader处理前最多经过的loader个数
+                }
+            },
+            {
+                loader: 'postcss-loader',
+                options: {
+                    plugins: [autoprefixer()]
+                }
+            },
+            {
+                loader: 'sass-loader'
+            }
+        ]
       },
       {
         test: /\.js$/,
